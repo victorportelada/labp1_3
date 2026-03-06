@@ -87,3 +87,46 @@ print(f"\nencoder_output shape : {encoder_output.shape}")
 print(f"decoder_state shape  : {decoder_state.shape}")
 print(f"contexto shape       : {contexto.shape}")
 print()
+
+
+# ──────────────────────────────────────────────
+# TAREFA 3 — Loop Auto-Regressivo
+# ──────────────────────────────────────────────
+
+# vocabulário fictício — índice 0 é <START>, índice 1 é <EOS>
+vocab = ["<START>", "<EOS>"] + [f"word_{i}" for i in range(2, VOCAB_SIZE)]
+
+# simula a passagem pelo decoder — retorna distribuição sobre o vocabulário
+def generate_next_token(sequencia_atual, encoder_out):
+    logits = np.random.randn(VOCAB_SIZE)
+
+    # força o <EOS> depois de 5 tokens gerados
+    if len(sequencia_atual) >= 5:
+        logits[1] = 100.0
+
+    return softmax(logits)
+
+
+# loop de inferência — uma palavra por vez até aparecer o <EOS>
+sequencia = ["<START>"]
+
+print("=" * 50)
+print("TAREFA 3 — Loop Auto-Regressivo")
+print("=" * 50)
+print()
+
+passo = 0
+while True:
+    probs         = generate_next_token(sequencia, encoder_output)
+    proximo_id    = np.argmax(probs)
+    proximo_token = vocab[proximo_id]
+
+    sequencia.append(proximo_token)
+    passo += 1
+    print(f"Passo {passo}: token gerado → '{proximo_token}'")
+
+    if proximo_token == "<EOS>":
+        break
+
+print()
+print(f"Frase gerada: {' '.join(sequencia)}")
